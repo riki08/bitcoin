@@ -1,3 +1,6 @@
+// ignore_for_file: prefer_const_constructors_in_immutables, prefer_const_constructors
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bitcoin/models/price_list_bitcoin.dart';
 import 'package:flutter_bitcoin/providers/bitcoin_provider.dart';
@@ -13,48 +16,137 @@ class BitcoinListPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Listado de precios',
+          style: TextStyle(fontSize: 25),
         ),
+        elevation: 0,
         centerTitle: true,
       ),
-      body: bitcoinProvider.prices.isNotEmpty
-          ? ListView.builder(
-              itemCount: bitcoinProvider.prices.length,
-              itemBuilder: (_, int index) {
-                return _ListPricesBitcoin(
-                  price: bitcoinProvider.prices[index],
-                );
-              })
-          : const Center(
-              child: CircularProgressIndicator(),
-            ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            _CurrentCurrency(bitcoinProvider: bitcoinProvider),
+            _ListPriceBitcoin(
+                bitcoinProvider: bitcoinProvider) //<< any widgets added
+          ],
+        ),
+      ),
     );
   }
 }
 
-class _ListPricesBitcoin extends StatelessWidget {
-  _ListPricesBitcoin({
-    required this.price,
+class _CurrentCurrency extends StatelessWidget {
+  _CurrentCurrency({
     Key? key,
+    required this.bitcoinProvider,
   }) : super(key: key);
+
+  final BitcoinProvider bitcoinProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    return bitcoinProvider.currentCurrency != null
+        ? GestureDetector(
+            onTap: () {
+              bitcoinProvider.selectedPrice =
+                  bitcoinProvider.currentCurrency!.rate;
+              Navigator.pushNamed(context, 'details',
+                  arguments: bitcoinProvider.currentCurrency!.rate);
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              // height: size.height * 0.2,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(
+                      'Precio actual BTN',
+                      style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black),
+                    ),
+                  ),
+                  Text(
+                    '\$${bitcoinProvider.currentCurrency!.rate} ' +
+                        bitcoinProvider.currentCurrency!.code,
+                    style: TextStyle(
+                        fontSize: 30,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          )
+        : SizedBox(
+            height: size.height * 0.2,
+          );
+  }
+}
+
+class _ListPriceBitcoin extends StatelessWidget {
+  _ListPriceBitcoin({
+    Key? key,
+    required this.bitcoinProvider,
+  }) : super(key: key);
+
+  final BitcoinProvider bitcoinProvider;
+
+  @override
+  Widget build(BuildContext context) {
+    return bitcoinProvider.prices.isNotEmpty
+        ? ListView.builder(
+            shrinkWrap: true, // use it
+            scrollDirection: Axis.vertical,
+            physics: NeverScrollableScrollPhysics(),
+            itemCount: bitcoinProvider.prices.length,
+            itemBuilder: (_, int index) {
+              return _CardBitcoin(
+                price: bitcoinProvider.prices[index],
+              );
+            })
+        : Center(
+            child: CircularProgressIndicator(),
+          );
+  }
+}
+
+class _CardBitcoin extends StatelessWidget {
+  _CardBitcoin({
+    required this.price,
+  });
 
   final PriceListBitcoinDates price;
 
   @override
   Widget build(BuildContext context) {
+    final bitcoinProvider = Provider.of<BitcoinProvider>(context);
     return ListTile(
-      onTap: () {},
+      onTap: () {
+        bitcoinProvider.selectedPrice = price.price.toString();
+        Navigator.pushNamed(context, 'details');
+      },
       leading: const Image(
         image: AssetImage('assets/bitcoin.png'),
         height: 40,
       ),
       title: Text(
         '\$${price.price.ceil()}',
-        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),
       ),
       subtitle: Text(
         price.formatDate,
-        style: const TextStyle(color: Colors.blueGrey, fontSize: 15),
+        style: const TextStyle(color: Colors.grey, fontSize: 15),
       ),
+      trailing: Icon(Icons.arrow_forward_ios),
     );
   }
 }

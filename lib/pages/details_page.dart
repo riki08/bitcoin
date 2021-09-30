@@ -6,6 +6,12 @@ class DetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text(
+          'Detalle de divisa',
+          style: TextStyle(fontSize: 25),
+        ),
+      ),
       body: Center(
         child: Text('Hola Mundo'),
       ),

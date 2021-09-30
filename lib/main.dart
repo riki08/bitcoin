@@ -16,6 +16,9 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Bitcoin App',
         debugShowCheckedModeBanner: false,
+        theme: ThemeData.light().copyWith(
+            colorScheme:
+                ThemeData().colorScheme.copyWith(primary: Colors.amber[800])),
         initialRoute: 'list-bitcoint',
         routes: {
           "list-bitcoint": (_) => BitcoinListPage(),
