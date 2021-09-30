@@ -47,9 +47,11 @@ class _CurrentCurrency extends StatelessWidget {
     final size = MediaQuery.of(context).size;
     return bitcoinProvider.currentCurrency != null
         ? GestureDetector(
-            onTap: () {
+            onTap: () async {
               bitcoinProvider.selectedPrice =
                   bitcoinProvider.currentCurrency!.rate;
+              await bitcoinProvider.getPriceCopbtn();
+              await bitcoinProvider.getPriceEurbtn();
               Navigator.pushNamed(context, 'details',
                   arguments: bitcoinProvider.currentCurrency!.rate);
             },

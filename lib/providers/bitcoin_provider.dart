@@ -16,8 +16,8 @@ class BitcoinProvider extends ChangeNotifier {
   List<PriceListBitcoinDates> prices = [];
   Currency? currentCurrency;
   String? selectedPrice;
-  Currency? priceCOP;
-  Currency? priceEUR;
+  String? priceCOP;
+  String? priceEUR;
 
   BitcoinProvider() {
     getListPriceBitcoin();
@@ -56,7 +56,6 @@ class BitcoinProvider extends ChangeNotifier {
   }
 
   getCurrentPricebtn() async {
-    print('entro');
     var response = await _getJsonData(_currenPrice);
 
     final decodeData = json.decode(response);
@@ -66,12 +65,20 @@ class BitcoinProvider extends ChangeNotifier {
   }
 
   getPriceCopbtn() async {
-    print('entro');
     var response = await _getJsonData(_priceCop);
 
     final decodeData = json.decode(response);
 
-    priceCOP = Currency.fromJson(decodeData['bpi']['COP']);
+    priceCOP = Currency.fromJson(decodeData['bpi']['COP']).rate;
+    notifyListeners();
+  }
+
+  getPriceEurbtn() async {
+    var response = await _getJsonData(_priceEur);
+
+    final decodeData = json.decode(response);
+
+    priceEUR = Currency.fromJson(decodeData['bpi']['EUR']).rate;
     notifyListeners();
   }
 }

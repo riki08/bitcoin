@@ -11,21 +11,21 @@ String currencyToJson(Currency data) => json.encode(data.toJson());
 class Currency {
   Currency({
     required this.code,
-    required this.symbol,
+    this.symbol,
     required this.rate,
     required this.description,
     required this.rateFloat,
   });
 
   String code;
-  String symbol;
+  String? symbol;
   String rate;
   String description;
   double rateFloat;
 
   factory Currency.fromJson(Map<String, dynamic> json) => Currency(
         code: json["code"],
-        symbol: json["symbol"],
+        symbol: json["symbol"] ?? '',
         rate: json["rate"],
         description: json["description"],
         rateFloat: json["rate_float"].toDouble(),
