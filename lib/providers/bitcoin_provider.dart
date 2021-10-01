@@ -102,11 +102,13 @@ class BitcoinProvider extends ChangeNotifier {
     print(double.parse(selectedPrice!));
 
     final convertCop =
-        decodeData['USD_COP'].toDouble() * double.parse(selectedPrice!);
+        (decodeData['USD_COP'].toDouble() * double.parse(selectedPrice!))
+            .ceil();
     priceCOP = convertCop.toString();
     print(priceCOP);
     final convertEur =
-        decodeData['USD_EUR'].toDouble() * double.parse(selectedPrice!);
+        (decodeData['USD_EUR'].toDouble() * double.parse(selectedPrice!))
+            .ceil();
     priceEUR = convertEur.toString();
     print(priceEUR);
   }
