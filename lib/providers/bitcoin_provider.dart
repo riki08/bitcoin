@@ -13,6 +13,8 @@ class BitcoinProvider extends ChangeNotifier {
   final String _priceList = '/v1/bpi/historical/close.json';
   final String _priceCop = '/v1/bpi/currentprice/COP.json';
   final String _priceEur = '/v1/bpi/currentprice/EUR.json';
+  final String _endpointConvert = 'free.currencyconverterapi.com';
+  final String _apiKey = '0ade467a2d5d275185eb';
   List<PriceListBitcoinDates> prices = [];
   Currency? currentCurrency;
   String? selectedPrice;
@@ -25,6 +27,7 @@ class BitcoinProvider extends ChangeNotifier {
     // Timer.periodic(const Duration(milliseconds: 100), (t) {
     //   getCurrentPricebtn();
     // });
+    // convertcurrency();
   }
 
   Future<String> _getJsonData(String endpoint) async {
@@ -80,5 +83,31 @@ class BitcoinProvider extends ChangeNotifier {
 
     priceEUR = Currency.fromJson(decodeData['bpi']['EUR']).rate;
     notifyListeners();
+  }
+
+  convertcurrency() async {
+    final url = Uri.https(_endpointConvert, '/api/v5/convert', {
+      "q": "USD_EUR,USD_COP",
+      "compact": "ultra",
+      "apiKey": "0ade467a2d5d275185eb"
+    });
+    print(url);
+
+    final response = await http.get(url);
+    print(response.body);
+
+    final decodeData = json.decode(response.body);
+    print(decodeData['USD_COP']);
+
+    print(double.parse(selectedPrice!));
+
+    final convertCop =
+        decodeData['USD_COP'].toDouble() * double.parse(selectedPrice!);
+    priceCOP = convertCop.toString();
+    print(priceCOP);
+    final convertEur =
+        decodeData['USD_EUR'].toDouble() * double.parse(selectedPrice!);
+    priceEUR = convertEur.toString();
+    print(priceEUR);
   }
 }
