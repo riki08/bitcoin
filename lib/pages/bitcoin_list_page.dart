@@ -49,7 +49,7 @@ class _CurrentCurrency extends StatelessWidget {
         ? GestureDetector(
             onTap: () async {
               bitcoinProvider.selectedPrice =
-                  bitcoinProvider.currentCurrency!.rateFloat.toString();
+                  bitcoinProvider.currentCurrency!.rateFloat.ceil().toString();
               await bitcoinProvider.convertcurrency();
               Navigator.pushNamed(context, 'details');
             },
@@ -128,7 +128,7 @@ class _CardBitcoin extends StatelessWidget {
     final bitcoinProvider = Provider.of<BitcoinProvider>(context);
     return ListTile(
       onTap: () async {
-        bitcoinProvider.selectedPrice = price.price.toString();
+        bitcoinProvider.selectedPrice = price.price.ceil().toString();
         await bitcoinProvider.convertcurrency();
         Navigator.pushNamed(context, 'details');
       },

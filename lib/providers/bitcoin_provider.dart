@@ -11,8 +11,8 @@ class BitcoinProvider extends ChangeNotifier {
   final String _baseUrl = 'api.coindesk.com';
   final String _currenPrice = '/v1/bpi/currentprice.json';
   final String _priceList = '/v1/bpi/historical/close.json';
-  final String _priceCop = '/v1/bpi/currentprice/COP.json';
-  final String _priceEur = '/v1/bpi/currentprice/EUR.json';
+  // final String _priceCop = '/v1/bpi/currentprice/COP.json';
+  // final String _priceEur = '/v1/bpi/currentprice/EUR.json';
   final String _endpointConvert = 'free.currencyconverterapi.com';
   final String _apiKey = '0ade467a2d5d275185eb';
   List<PriceListBitcoinDates> prices = [];
@@ -24,10 +24,9 @@ class BitcoinProvider extends ChangeNotifier {
   BitcoinProvider() {
     getListPriceBitcoin();
     getCurrentPricebtn();
-    // Timer.periodic(const Duration(milliseconds: 100), (t) {
-    //   getCurrentPricebtn();
-    // });
-    // convertcurrency();
+    Timer.periodic(const Duration(seconds: 60), (t) {
+      getCurrentPricebtn();
+    });
   }
 
   Future<String> _getJsonData(String endpoint) async {
@@ -67,49 +66,22 @@ class BitcoinProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  getPriceCopbtn() async {
-    var response = await _getJsonData(_priceCop);
-
-    final decodeData = json.decode(response);
-
-    priceCOP = Currency.fromJson(decodeData['bpi']['COP']).rate;
-    notifyListeners();
-  }
-
-  getPriceEurbtn() async {
-    var response = await _getJsonData(_priceEur);
-
-    final decodeData = json.decode(response);
-
-    priceEUR = Currency.fromJson(decodeData['bpi']['EUR']).rate;
-    notifyListeners();
-  }
-
   convertcurrency() async {
-    final url = Uri.https(_endpointConvert, '/api/v5/convert', {
-      "q": "USD_EUR,USD_COP",
-      "compact": "ultra",
-      "apiKey": "0ade467a2d5d275185eb"
-    });
-    print(url);
+    final url = Uri.https(_endpointConvert, '/api/v5/convert',
+        {"q": "USD_EUR,USD_COP", "compact": "ultra", "apiKey": _apiKey});
 
     final response = await http.get(url);
-    print(response.body);
 
     final decodeData = json.decode(response.body);
-    print(decodeData['USD_COP']);
-
-    print(double.parse(selectedPrice!));
 
     final convertCop =
         (decodeData['USD_COP'].toDouble() * double.parse(selectedPrice!))
             .ceil();
     priceCOP = convertCop.toString();
-    print(priceCOP);
+
     final convertEur =
         (decodeData['USD_EUR'].toDouble() * double.parse(selectedPrice!))
             .ceil();
     priceEUR = convertEur.toString();
-    print(priceEUR);
   }
 }
